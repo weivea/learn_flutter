@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class RouteDemo extends StatefulWidget {
   RouteDemo({Key key}) : super(key: key);
@@ -20,7 +21,6 @@ class _RouteDemoState extends State<RouteDemo> with TickerProviderStateMixin{
       duration: const Duration(milliseconds: 2000), 
       vsync: this
     );
-    print(_controllerTest);
     _controllerTest.forward();
     super.initState();
   }
@@ -30,8 +30,8 @@ class _RouteDemoState extends State<RouteDemo> with TickerProviderStateMixin{
     // 获取裸游参数
     final Map routeArguments = ModalRoute.of(context).settings.arguments;
     GlobalKey _key = GlobalKey();
+    GlobalKey _key2 = GlobalKey();
     
-    print(_controllerTest);
     return Scaffold(
       appBar: AppBar(
         title: Text(routeArguments['title']),
@@ -51,13 +51,13 @@ class _RouteDemoState extends State<RouteDemo> with TickerProviderStateMixin{
               key: _key,
               // 小惊喜，闭包传参~啦啦啦
               onTap: ((param) => () {
-                    print(param);
+                    // print(param);
                     RenderBox box = _key.currentContext.findRenderObject();
                     Offset offset = box.localToGlobal(Offset.zero);
                     //获取size
                     Size size = box.size;
-                    print(offset);
-                    _routeToNextPage(context, param, offset: offset, size: size);
+                    // print(offset);
+                    _routeToNextPage(context, NextPage(), param, offset: offset, size: size);
                   })('1111'),
               leading: Icon(
                 Icons.adjust,
@@ -67,39 +67,42 @@ class _RouteDemoState extends State<RouteDemo> with TickerProviderStateMixin{
               title: Text('路由跳转动画', style: TextStyle(color: Colors.white),),
             ),
           ),
+          // Hero(
+          //   tag: 'NextPage2',
           Container(
-            height: 100.0,
-            
-            child: Stack(
-              children: <Widget>[
-                SizeTransition(
-                  axis: Axis.vertical, //控制宽度或者高度缩放
-                  sizeFactor: Tween(begin: 1.0, end: 0.5).animate(_controllerTest),
-                  child: Container(
-                    width: 100.0,
-                    height: 100.0,
-                    color: Colors.red,
-                    child: Text('12345678'),
-                  )
-                ),
-              ],
+            height: 380.0,
+            padding: EdgeInsets.all(40),
+            child:  GestureDetector(
+              key: _key2,
+              onTap: (){
+                RenderBox box = _key2.currentContext.findRenderObject();
+                Offset offset = box.localToGlobal(Offset.zero);
+                //获取size
+                Size size = box.size;
+                _routeToNextPage(context, NextPage2(), '222222', offset: offset, size: size);
+              },
+              child: Hero(
+                tag: 'NextPage2',
+                child: Image.asset('assets/img/g1.jpeg', fit: BoxFit.fill,),
+              ),
             ),
           ),
+          // ),
         ],
       ),
     );
   }
 
-  void _routeToNextPage(BuildContext parentContext, dynamic params, {Offset offset, Size size}) {
+  void _routeToNextPage(BuildContext parentContext, Widget child, dynamic params, {Offset offset, Size size}) {
     var contextSize = parentContext.size;
     Navigator.push(
         parentContext,
         PageRouteBuilder(
             settings: RouteSettings(arguments: params), // 传递数据到下一页
-            transitionDuration: const Duration(milliseconds: 700), //设置动画时长500毫秒
+            transitionDuration: const Duration(milliseconds: 500), //设置动画时长500毫秒
             pageBuilder: (BuildContext context, Animation<double> animation,
                 Animation<double> secondaryAnimation) {
-              return NextPage();
+              return child;
             },
             transitionsBuilder: (BuildContext context,
                 Animation<double> animation,
@@ -135,8 +138,8 @@ class _RouteDemoState extends State<RouteDemo> with TickerProviderStateMixin{
                 tweenOffsetY = 1.0;
               }
               var tweenOffsetBegin = Offset(0.0, tweenOffsetY);
-              print(tweenOffsetBegin);
-              print(tweenHBegin);
+              // print(tweenOffsetBegin);
+              // print(tweenHBegin);
               var animationCustom = Tween(begin: acos(tweenHBegin), end: 0.0).animate(CurvedAnimation( 
                   parent: animation, 
                   curve: Curves.fastOutSlowIn));
@@ -194,3 +197,72 @@ class NextPage extends StatelessWidget {
     );
   }
 }
+
+
+class NextPage2 extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // 接收参数
+    var routeArguments = ModalRoute.of(context).settings.arguments;
+
+    return Scaffold(
+      // appBar: AppBar(
+      //   title: Text('NextPage2'),
+      // ),
+      body: Stack(
+        children: <Widget>[
+          ListView (
+            shrinkWrap: true,
+            children: <Widget>[
+              Container(
+                height: 420.0,
+                child:  Hero(
+                  tag: 'NextPage2',
+                  child: Image.asset('assets/img/g1.jpeg', fit: BoxFit.fill,),
+                ),
+              ),
+              ListTile(
+                leading: Icon(Icons.add_circle, color: Colors.purpleAccent,),
+                title: Text('accept 参数: ${routeArguments.toString()}', style: TextStyle(fontSize: 20),),
+              ),
+              Padding(
+                padding: EdgeInsets.all(20),
+                child: MarkdownBody(data: _desc),
+              )
+            ],
+          ),
+          Positioned(
+            top: 0,
+            right: 0,
+            child: SafeArea(
+              child: IconButton(
+                color: Color.fromARGB(255, 205, 155, 0),
+                icon: Icon(Icons.cancel),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+const _desc = '''
+# 说明
+我是来占位置的；
+
+## Hero动画
+
+```
+Hero(
+  tag: 'NextPage2',
+  child: Image.asset('assets/img/g1.jpeg', fit: BoxFit.fill,),
+)
+```
+## bug疑问
+
+在做路由动画时，使用 SizeTransition 不生效，不知道为什么~
+
+''';
