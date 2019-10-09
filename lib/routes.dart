@@ -3,11 +3,15 @@ import 'page/FirstDemo.dart';
 import 'page/AssetsDemo.dart';
 import 'page/NetworkImageDemo.dart';
 import 'page/RouteDemo.dart';
+import 'page/ScrollDemo.dart';
+import 'page/CutomNestScroll.dart';
 final Map<String, WidgetBuilder> appRoutes = {
   '第一个demo -> ' : (context) => FirstDemo(),
   '资源获取 -> ' : (context) => AssetsDemo(),
   '网络图片 -> ' : (context) => NetworkImageDemo(),
   '路由跳转 -> ' : (context) => RouteDemo(),
+  '滚动scroll -> ' : (context) => ScrollDemo(),
+  '滚动嵌套 -> ' : (context) => CutomNestScroll(),
 };
 
 
