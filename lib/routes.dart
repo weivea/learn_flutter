@@ -5,6 +5,7 @@ import 'page/NetworkImageDemo.dart';
 import 'page/RouteDemo.dart';
 import 'page/ScrollDemo.dart';
 import 'page/CutomNestScroll.dart';
+import 'page/TabViewDemo.dart';
 final Map<String, WidgetBuilder> appRoutes = {
   '第一个demo -> ' : (context) => FirstDemo(),
   '资源获取 -> ' : (context) => AssetsDemo(),
@@ -12,6 +13,7 @@ final Map<String, WidgetBuilder> appRoutes = {
   '路由跳转 -> ' : (context) => RouteDemo(),
   '滚动scroll -> ' : (context) => ScrollDemo(),
   '滚动嵌套 -> ' : (context) => CutomNestScroll(),
+  'TabView -> ' : (context) => TabViewDemo(),
 };
 
 

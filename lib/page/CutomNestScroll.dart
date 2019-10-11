@@ -28,18 +28,7 @@ class _CutomNestScrollState extends State<CutomNestScroll> {
   void initState() {
     scrollController = ScrollController();
     scrollController2 = ScrollController();
-    scrollController.addListener((){
-      // 内部的 滚动offset不能保持，当它不在视窗之后，offset会重置为0~，打个补丁~
-      if (scrollController2.positions.isEmpty) {
-        shuldResetScrollController2 = true;
-      } else {
-        if (shuldResetScrollController2) {
-          scrollController2.jumpTo(scrollController2Offset);
-          shuldResetScrollController2 = false;
-        }
-        scrollController2Offset = scrollController2.offset;
-      }
-    });
+    scrollController.addListener(_scrollControllerListener);
     super.initState();
   }
 
@@ -51,9 +40,23 @@ class _CutomNestScrollState extends State<CutomNestScroll> {
 
   @override
   void dispose() {
+    scrollController.removeListener(_scrollControllerListener);
     scrollController.dispose();
     scrollController2.dispose();
     super.dispose();
+  }
+
+  void _scrollControllerListener(){
+    // 内部的 滚动offset不能保持，当它不在视窗之后，offset会重置为0~，打个补丁~
+    if (!scrollController2.hasClients) {
+      shuldResetScrollController2 = true;
+    } else {
+      if (shuldResetScrollController2) {
+        scrollController2.jumpTo(scrollController2Offset);
+        shuldResetScrollController2 = false;
+      }
+      scrollController2Offset = scrollController2.offset;
+    }
   }
   @override
   Widget build(BuildContext context) {
